@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
-from database import Base
+from app.database import Base
 
 #Tabela criada com base no arquivo movies.csv
 class Movie(Base):
