@@ -2,11 +2,11 @@ import os
 import logging
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-import app.models, app.crud, app.utils
 from app.database import Session_Local, engine, Base
 from app.schemas import Interval_Response
 from app.utils import import_movie_list
 from datetime import datetime
+from app.crud import report_intervals
 
 app = FastAPI()
 
@@ -62,4 +62,12 @@ def import_CSV(db: Session = Depends(get_db)):
 # Endereço do endpoint de intervalos, junto da def
 @app.get("/producers/intervals", response_model=Interval_Response)
 def get_Intervals(db : Session = Depends(get_db)):
-    return None
+    try:
+        # Registrando no log
+        logging.info(f'Iniciando relatório de intervalo...')
+        
+        return report_intervals(db, logging)
+      
+    except Exception as e:
+        logging.error(f'Erro na importação. Erro: {str(e)}')
+        raise HTTPException(status_code=400, detail=str(e))
