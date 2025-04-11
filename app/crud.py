@@ -19,17 +19,23 @@ def report_intervals(db, log):
 
         log.info(f'Iterando sobre os filme vencedores e acumulando na lista de producers_years...')
         for winner in winners:
+            # Gerando um dicionário temporário para armazenar os produtores e possíveis , e and
+            producers_temp = []
+            
+            # Verifica se tem , no campo para saber se tem mais de 1 produtor
             if "," in winner.producers:
                 producers_temp = winner.producers.split(",")
             else:
                 producers_temp = [winner.producers]
 
+            # Verifica se tem and no campo para saber se tem mais de 1 produtor
             for producer in producers_temp:            
                 if " and " in producer:
                     producers_temp += producer.split(" and ")
 
             producers = []
 
+            # Acumulando no dicionário de producers
             for temp in producers_temp:
                 if (temp.strip() not in producers) and (not "," in temp.strip()) and (not "and" in temp.strip()):
                     producers.append(temp.strip())
@@ -59,16 +65,18 @@ def report_intervals(db, log):
             return {"max": [], "min": []}
         
         # Inicializa as variáveis com o primeiro intervalo da lista
+        log.info(f'Iniciando variáveis para pegar intervalo maior e menor...')
         min_interval = 99999
         max_interval = 0
 
+        log.info(f'Iterando os intervalos para setar as variáveis de menor e maior intervalo...')
         for interval in intervals:
             if interval["interval"] < min_interval:
                 min_interval = interval["interval"]
             if interval["interval"] > max_interval:
                 max_interval = interval["interval"]
 
-        log.info(f'Relatório de intervalos pronto...')
+        log.info(f'Montando o relatório final...')
         
         return {
             "min": [interval for interval in intervals if interval["interval"] == min_interval],
