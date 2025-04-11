@@ -66,7 +66,9 @@ def get_Intervals(db : Session = Depends(get_db)):
         # Registrando no log
         logging.info(f'Iniciando relatório de intervalo...')
         
-        return report_intervals(db, logging)
+        relatorio = report_intervals(db, logging)
+
+        return relatorio
       
     except Exception as e:
         logging.error(f'Erro na importação. Erro: {str(e)}')

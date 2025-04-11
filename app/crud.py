@@ -19,9 +19,24 @@ def report_intervals(db, log):
 
         log.info(f'Iterando sobre os filme vencedores e acumulando na lista de producers_years...')
         for winner in winners:
-            producers = winner.producers.split(",")
+            if "," in winner.producers:
+                producers_temp = winner.producers.split(",")
+            else:
+                producers_temp = [winner.producers]
+
+            for producer in producers_temp:            
+                if " and " in producer:
+                    producers_temp += producer.split(" and ")
+
+            producers = []
+
+            for temp in producers_temp:
+                if (temp.strip() not in producers) and (not "," in temp.strip()) and (not "and" in temp.strip()):
+                    producers.append(temp.strip())
+
             for producer in producers:
-                producers_years[producer.strip()].append(winner.year)
+                if producer.strip():
+                    producers_years[producer.strip()].append(winner.year)
 
         # Dicionário que irá armazenar os intervalos
         intervals = []
@@ -36,7 +51,7 @@ def report_intervals(db, log):
                     "producer" : producer,
                     "interval" : years[year_count + 1] - years[year_count],
                     "previousWin" : years[year_count],
-                    "followinWin" : years[year_count + 1],
+                    "followingWin" : years[year_count + 1],
                 })
 
         if intervals == []:
@@ -44,8 +59,8 @@ def report_intervals(db, log):
             return {"max": [], "min": []}
         
         # Inicializa as variáveis com o primeiro intervalo da lista
-        min_interval = intervals[0]["interval"]
-        max_interval = intervals[0]["interval"]
+        min_interval = 99999
+        max_interval = 0
 
         for interval in intervals:
             if interval["interval"] < min_interval:
@@ -56,8 +71,8 @@ def report_intervals(db, log):
         log.info(f'Relatório de intervalos pronto...')
         
         return {
-            "max": [interval for interval in intervals if interval["interval"] == max_interval],
             "min": [interval for interval in intervals if interval["interval"] == min_interval],
+            "max": [interval for interval in intervals if interval["interval"] == max_interval],            
         }        
         
 
