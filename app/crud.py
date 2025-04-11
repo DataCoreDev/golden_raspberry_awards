@@ -1,9 +1,90 @@
+import pandas as pd
 from collections import defaultdict
 from app.models import Movie
 
 ####################
 # Comentários do código sendo mostrados no log
 ####################
+
+# Função para importar o arquivo CSV e salvar no banco de dados
+def import_movie_list(path, db, log=None):
+    # Primeiro verificar se o aquivo antes de importar, se não existir retorna um erro
+    try:
+        if log:
+            log.info(f'Verificando se o arquivo existe...')
+
+        csv_file = pd.read_csv(path, delimiter=';', quoting=3)
+    except Exception as e:
+        raise FileNotFoundError(f"Erro ao carregar arquivo. Erro: {e}")
+    
+    # Verifica se o arquivo está vazio
+    if log:
+        log.info(f'Verificando se o arquivo está vazio...')
+
+    if csv_file.empty:
+        raise ValueError("Arquivo CSV vazio.")
+    
+    # Verifica se as colunas necessárias estão presentes
+    if log:
+        log.info(f'Validando as colunas...')
+
+    required_columns = ["year", "title", "studios", "producers", "winner"] 
+    for col in required_columns:
+        if col not in csv_file.columns:
+            log.error(f'Coluna {col} não encontrada no arquivo CSV.')
+            raise ValueError(f"Coluna {col} não encontrada no arquivo CSV.")
+        
+    try:
+        # Converte o DataFrame para uma lista de dicionários
+        if log:    
+            log.info(f'Convertendo o dataframe...')
+
+        data = csv_file.to_dict(orient="records") 
+        movie = None       
+
+        # Iterando sobre os dados e criando os Movies
+        if log:
+            log.info(f'iterando linhas...')
+
+        for intcount, row in enumerate(data):
+            # Buscando no BD se o filme já existe
+            movie_exists = db.query(Movie).filter_by(
+                year=row["year"],
+                title=row["title"],
+                studios=row["studios"],
+                producers=row["producers"],
+                winner= True if row["winner"] == 'yes' else False,
+            ).first()
+
+            #log.info(f'linha {intcount}...')
+
+            # Se não existir ele insere
+            if movie_exists is None:
+                movie = Movie(
+                    year=row["year"],
+                    title=row["title"],
+                    studios=row["studios"],
+                    producers=row["producers"],
+                    winner= True if row["winner"] == 'yes' else False,
+                )
+
+                # Adiciona o objeto Movie à sessão do banco de dados            #     
+                db.add(movie)
+
+        # Adiciona os objetos Movie à sessão do banco de dados        
+        if movie:
+            if log:
+                log.info(f'Commitando o banco de dados...')
+
+            db.commit()
+        
+    except Exception as e:
+        if log:
+            log.error(f'Erro ao importar dados para o banco de dados. Erro: {str(e)}')
+            
+        # Cancelando os lançamentos no BD
+        db.rollback()
+        raise ValueError(f"Erro ao importar dados para o banco de dados. Erro: {str(e)}")
 
 def report_intervals(db, log):
     try:
@@ -51,7 +132,7 @@ def report_intervals(db, log):
         for producer, years in producers_years.items():
             sorted_years = sorted(years)
 
-            log.info(f'Montando o dicionário e fazendo os cálulos de intervalos...')
+            #log.info(f'Montando o dicionário e fazendo os cálulos de intervalos...')
             for year_count in range(len(sorted_years) - 1):
                 intervals.append({
                     "producer" : producer,
