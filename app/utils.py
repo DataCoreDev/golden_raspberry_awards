@@ -54,7 +54,7 @@ def import_movie_list(path, db):
             db.commit()
         
     except Exception as e:
-        #Cancelando os lançamentos no BD
+        # Cancelando os lançamentos no BD
         db.rollback()
         raise ValueError(f"Erro ao importar dados para o banco de dados. Erro: {e.message}")
 
