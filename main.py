@@ -28,7 +28,6 @@ logging.basicConfig(filename=NOME_ARQUIVO_LOG, level=logging.INFO,
                     format='%(asctime)s %(levelname)s:%(message)s')
 
 def get_db():
-
     logging.info(f'Conectando com o BD...')
     db = Session_Local()
 
@@ -66,7 +65,7 @@ def get_Intervals(db : Session = Depends(get_db)):
         # Registrando no log
         logging.info(f'Iniciando relatório de intervalo...')
         
-        return report_intervals(db, logging)
+        return report_intervals(db, logging)        
       
     except Exception as e:
         logging.error(f'Erro na importação. Erro: {str(e)}')
