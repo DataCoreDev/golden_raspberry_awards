@@ -12,7 +12,6 @@ app = FastAPI()
 
 Base.metadata.create_all(bind=engine)
 
-
 today = datetime.now().date()
 
 # Variáveis para o arquivo de log
@@ -47,18 +46,18 @@ def import_CSV(db: Session = Depends(get_db)):
         logging.info(f'Iniciando importação...')
 
         # Def feita no app/utils
-        import_movie_list("databd/movielist(2).csv", db)
+        import_movie_list("databd/movielist(2).csv", db, logging)
 
         logging.info(f'Importação realizada...')
 
         # Retornando uma mensagem de sucesso
         return {
             "message": "Arquivo importado com sucesso!",
-            "file": "movies.csv"
+            "file": "movielist(2).csv"
         }        
     except Exception as e:
-        logging.info(f'Erro na importação. Erro: {e.message}')
-        raise HTTPException(status_code=400, detail=e.message)
+        logging.error(f'Erro na importação. Erro: {str(e)}')
+        raise HTTPException(status_code=400, detail=str(e))
 
 # Endereço do endpoint de intervalos, junto da def
 @app.get("/producers/intervals", response_model=Interval_Response)
