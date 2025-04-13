@@ -35,19 +35,14 @@ def test_report_intervals():
         assert "min" in data
         assert "max" in data
 
-        # Verificando se o JSON  está na estrura certa
-        for item in data["min"]:
-            assert "producer" in item
-            assert "interval" in item
-            assert "previousWin" in item
-            assert "followingWin" in item
+        result_data = data["min"] + data["max"]
 
         # Verificando se o JSON  está na estrura certa
-        for item in data["max"]:
+        for item in result_data:
             assert "producer" in item
             assert "interval" in item
             assert "previousWin" in item
-            assert "followingWin" in item
+            assert "followingWin" in item       
 
         print(f"Teste realizado com sucesso!")        
     except Exception as e:

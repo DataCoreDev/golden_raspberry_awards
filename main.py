@@ -14,7 +14,7 @@ today = datetime.now().date()
 
 # Variáveis para o arquivo de log
 LOG_DIR = 'logs'
-NOME_ARQUIVO_LOG = f'{LOG_DIR}\\robo_calibracoes_{str(today.day).zfill(2)}-{str(today.month).zfill(2)}-{str(today.year).zfill(4)}.log'
+NOME_ARQUIVO_LOG = f'{LOG_DIR}\\gra_{str(today.day).zfill(2)}-{str(today.month).zfill(2)}-{str(today.year).zfill(4)}.log'
 
 # Criação do diretório de logs, caso não exista
 if not os.path.exists(LOG_DIR):
